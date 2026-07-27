@@ -1,4 +1,4 @@
-# Expediente Oculto · Demo V2
+# Expediente Oculto · Demo V2.1
 
 Demo técnica y jugable de **Expediente Oculto**. No es la aplicación final de 80 casos.
 
@@ -26,3 +26,9 @@ Para una subida rápida desde móvil también se incluye una versión autónoma 
 ## Fuentes
 
 Cada expediente contiene enlaces a fuentes institucionales o museísticas verificables. Los casos distinguen hechos documentados, resoluciones judiciales y controversias posteriores.
+
+
+## Corrección V2.1
+- La fase 2 acepta variantes y pequeños errores al escribir el arma.
+- Al acertar, desplaza automáticamente a la fase 3.
+- Añade confirmación visible y permite validar con Enter.
