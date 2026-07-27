@@ -1,5 +1,5 @@
-const CACHE='expediente-oculto-demo-v2-1';
-const ASSETS=['./','./index.html','./manifest.json','./icons/icon-192.png','./icons/icon-512.png'];
+const CACHE='expediente-oculto-demo-v2-2';
+const ASSETS=['./index.html','./manifest.json','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
@@ -18,7 +18,7 @@ self.addEventListener('fetch',event=>{
 
   if(event.request.mode==='navigate'){
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request,{cache:'no-store'})
         .then(response=>{
           const copy=response.clone();
           caches.open(CACHE).then(cache=>cache.put('./index.html',copy));

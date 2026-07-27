@@ -177,6 +177,8 @@
     .hint { color:var(--muted); line-height:1.5; font-size:.9rem; }
     .stage { margin-top:16px; padding:18px; }
     .stage.locked { opacity:.52; }
+    .stage-pulse { animation:stagePulse .9s ease; }
+    @keyframes stagePulse { 0%,100%{outline:0 solid transparent} 35%{outline:4px solid var(--accent-soft)} }
     .choice-grid { display:grid; gap:8px; }
     .choice { text-align:left; border:1px solid var(--border); background:var(--surface-2); padding:12px; border-radius:12px; }
     .choice.correct { border-color:var(--success); }
@@ -411,8 +413,19 @@ function showModal(html){ document.getElementById('modal').innerHTML=html;docume
 function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); }
 function refreshGlobal(){ renderHome();renderCases();renderArchive();renderMiniGames();applySettings(); }
 function persistAndRefreshCase(nextStageId){
-  saveState();refreshGlobal();if(activeCaseId)renderCase();
-  if(nextStageId)setTimeout(()=>document.getElementById(nextStageId)?.scrollIntoView({behavior:state.settings.reducedMotion?'auto':'smooth',block:'start'}),80);
+  saveState();
+  if(activeCaseId)renderCase();
+  try{refreshGlobal();}catch(error){console.error('Error al actualizar las pantallas generales:',error);}
+  if(nextStageId){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const stage=document.getElementById(nextStageId);
+      if(stage){
+        stage.scrollIntoView({behavior:state.settings.reducedMotion?'auto':'smooth',block:'start'});
+        stage.classList.add('stage-pulse');
+        setTimeout(()=>stage.classList.remove('stage-pulse'),1200);
+      }
+    }));
+  }
 }
 
 document.getElementById('modalBackdrop').addEventListener('click',e=>{
@@ -513,7 +526,7 @@ function renderCase(){
   const topRaw=showLeftovers?rawLeftovers(c,true):'',bottomRaw=showLeftovers?rawLeftovers(c,false):'';
   document.getElementById('screen-case').innerHTML=`
     <div class="case-header"><button class="icon-btn back" data-nav="cases" aria-label="Volver">←</button><div><small>EXPEDIENTE ${c.number} · ${c.date}</small><h2>${c.title}</h2></div></div>
-    <div class="demo-badge">DEMO V2.1 · caso real documentado · ${pct(c)}% completado</div>
+    <div class="demo-badge">DEMO V2.2 · caso real documentado · ${pct(c)}% completado</div>
     <article class="paper" style="margin-top:14px">${renderIntro(c,p)}</article>
     <div class="game-layout">
       <article class="card game-panel"><div class="eyebrow">Fase 1</div><h3>Sopa de letras</h3><p class="hint">Arrastra en línea recta. Siete palabras sí aparecen. Una está ausente y tendrás que identificarla sin opciones.</p>
@@ -527,7 +540,7 @@ function renderCase(){
     <article class="card stage ${allPresent?'':'locked'}" id="phase2"><div class="eyebrow">Fase 2</div><h3>La palabra ausente</h3>
       ${!allPresent?'<p class="hint">Encuentra primero las siete palabras presentes.</p>':p.missingSolved?'<p class="status-ok">✓ Arma identificada mediante la palabra que faltaba.</p>':`<p class="hint">Escribe la palabra de la lista que no estaba en la sopa. Acepta mayúsculas, minúsculas, tildes, variantes habituales y pequeños errores de escritura.</p><div class="answer-block"><label class="field-label">Arma deducida<input class="field" id="missingAnswer" autocomplete="off" autocapitalize="characters" enterkeyhint="done" placeholder="Escríbela, sin elegir entre opciones"></label><button class="btn" type="button" id="checkMissing">Comprobar arma</button><div class="feedback" id="missingFeedback" aria-live="polite">Al acertar, la aplicación te llevará automáticamente a la fase 3.</div></div>`}
     </article>
-    ${p.missingSolved?renderLeftoverStage(c,p,topRaw,bottomRaw):''}
+    ${renderLeftoverStage(c,p,topRaw,bottomRaw)}
     ${p.leftoversSolved?renderCodesStage(c,p):''}
     ${p.leftoversSolved?renderEvidence(c,p):''}
     ${allCodesSolved(c,p)?deductionHtml(c,p):''}
@@ -535,6 +548,9 @@ function renderCase(){
   setupGridSelection(c,p);bindCaseActions(c,p);
 }
 function renderLeftoverStage(c,p,topRaw,bottomRaw){
+  if(!p.missingSolved){
+    return `<article class="card stage locked" id="phase3"><div class="eyebrow">Fase 3 · bloqueada</div><h3>Letras sobrantes</h3><p class="hint">Se desbloquea al identificar correctamente el arma en la fase 2.</p></article>`;
+  }
   return `<article class="card stage" id="phase3"><div class="eyebrow">Fase 3</div><h3>Letras sobrantes</h3>
     <p class="hint">Las casillas claras no pertenecen a ninguna palabra encontrada. Copia y analiza ambos bloques. Hay letras útiles y ruido añadido; la app no escribirá la solución por ti.</p>
     <div class="leftover-wrap"><div><small class="eyebrow">Bloque A · primeras cinco filas</small><div class="leftover-strip">${chunkLetters(topRaw)}</div></div><div><small class="eyebrow">Bloque B · filas restantes</small><div class="leftover-strip">${chunkLetters(bottomRaw)}</div></div></div>
@@ -657,7 +673,7 @@ async function installApp(){
 }
 document.getElementById('installTop').addEventListener('click',installApp);
 document.getElementById('installSettings').addEventListener('click',installApp);
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=2.1').catch(()=>{}));
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=2.2').catch(()=>{}));
 
 refreshGlobal();
 

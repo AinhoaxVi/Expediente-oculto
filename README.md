@@ -1,4 +1,4 @@
-# Expediente Oculto · Demo V2.1
+# Expediente Oculto · Demo V2.2
 
 Demo técnica y jugable de **Expediente Oculto**. No es la aplicación final de 80 casos.
 
@@ -28,7 +28,15 @@ Para una subida rápida desde móvil también se incluye una versión autónoma 
 Cada expediente contiene enlaces a fuentes institucionales o museísticas verificables. Los casos distinguen hechos documentados, resoluciones judiciales y controversias posteriores.
 
 
-## Corrección V2.1
+## Corrección V2.2
 - La fase 2 acepta variantes y pequeños errores al escribir el arma.
 - Al acertar, desplaza automáticamente a la fase 3.
 - Añade confirmación visible y permite validar con Enter.
+
+
+## Corrección V2.2
+
+- La fase 3 siempre aparece en pantalla: bloqueada antes de resolver el arma y jugable después.
+- El expediente se vuelve a renderizar antes de actualizar el resto de pantallas.
+- Al desbloquear una fase, la app se desplaza hasta ella y la resalta.
+- El service worker usa navegación con red primero para evitar versiones antiguas atrapadas en caché.
