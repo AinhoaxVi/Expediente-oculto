@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#11130f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Expediente" />
+  <meta name="description" content="Expediente Oculto: casos reales, sopas de letras y puzles de investigación." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Expediente Oculto</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0c0e0b;
+      --surface: #151812;
+      --surface-2: #1e221a;
+      --paper: #d5ceb9;
+      --ink: #171912;
+      --text: #f4f0e3;
+      --muted: #aba994;
+      --accent: #d0a94d;
+      --accent-2: #a33a32;
+      --success: #67b67a;
+      --border: rgba(244,240,227,.14);
+      --shadow: 0 18px 55px rgba(0,0,0,.36);
+      --radius: 20px;
+      --safe-bottom: max(14px, env(safe-area-inset-bottom));
+    }
+    body.paper-mode {
+      --bg: #d8d0bb;
+      --surface: #eee7d5;
+      --surface-2: #dfd5bd;
+      --text: #191b14;
+      --muted: #686654;
+      --border: rgba(25,27,20,.18);
+      --shadow: 0 18px 40px rgba(52,45,31,.18);
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 80% -10%, rgba(208,169,77,.11), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.015), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--accent); }
+    .app { min-height: 100vh; padding-bottom: 92px; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: max(14px, env(safe-area-inset-top)) 18px 12px;
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 13px;
+      display: grid; place-items: center;
+      background: var(--accent); color: #15140e;
+      font-weight: 900; letter-spacing: -.05em;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.18);
+    }
+    .brand strong { display: block; font-family: Georgia, serif; letter-spacing: .035em; }
+    .brand small { color: var(--muted); }
+    .icon-btn {
+      width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--surface); display: grid; place-items: center; cursor: pointer;
+    }
+    main { width: min(100%, 880px); margin: 0 auto; padding: 20px 16px 30px; }
+    .screen { display: none; animation: fade .22s ease; }
+    .screen.active { display: block; }
+    @keyframes fade { from { opacity: .4; transform: translateY(5px); } }
+    .hero {
+      position: relative; overflow: hidden; padding: 28px 22px;
+      min-height: 300px; border: 1px solid var(--border); border-radius: 28px;
+      background: linear-gradient(145deg, #20231a, #11130f 72%);
+      box-shadow: var(--shadow);
+    }
+    body.paper-mode .hero { background: linear-gradient(145deg, #f1ead8, #d9cfb8); }
+    .hero::after {
+      content: "CONFIDENCIAL"; position: absolute; right: -34px; top: 55px;
+      transform: rotate(19deg); padding: 8px 38px; border: 3px solid rgba(163,58,50,.5);
+      color: rgba(163,58,50,.58); font-weight: 900; letter-spacing: .16em;
+    }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .18em; font-size: .72rem; font-weight: 800; }
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; }
+    h1 { font-size: clamp(2.6rem, 11vw, 5rem); line-height: .93; margin: 18px 0 12px; max-width: 650px; }
+    h2 { font-size: 2rem; margin: 4px 0 16px; }
+    h3 { font-size: 1.3rem; }
+    .hero p { color: var(--muted); max-width: 560px; line-height: 1.6; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .btn {
+      border: 0; border-radius: 14px; padding: 13px 16px; cursor: pointer;
+      background: var(--accent); color: #16140d; font-weight: 850;
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+    }
+    .btn.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    .btn.danger { background: var(--accent-2); color: #fff; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0 26px; }
+    .stat, .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .stat { padding: 16px 10px; text-align: center; }
+    .stat strong { display:block; font-size: 1.55rem; color: var(--accent); }
+    .stat span { font-size: .78rem; color: var(--muted); }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin:28px 2px 14px; }
+    .section-head p { margin:0; color:var(--muted); }
+    .case-list { display:grid; gap:14px; }
+    .case-card { padding: 18px; cursor: pointer; position:relative; overflow:hidden; }
+    .case-card::before { content:""; position:absolute; inset:0 auto 0 0; width:4px; background:var(--accent); }
+    .case-card .meta { color:var(--muted); font-size:.83rem; }
+    .case-card h3 { margin:8px 0 7px; }
+    .case-card p { color:var(--muted); line-height:1.45; margin:0 0 14px; }
+    .progress { height:7px; border-radius:999px; background:var(--surface-2); overflow:hidden; }
+    .progress > span { display:block; height:100%; background:var(--accent); width:0; transition:width .25s ease; }
+    .chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+    .chip { font-size:.74rem; padding:6px 9px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border); color:var(--muted); }
+    .chip.done { color:var(--success); }
+    .filter-row { display:flex; gap:8px; overflow:auto; padding-bottom:4px; }
+    .filter { white-space:nowrap; border:1px solid var(--border); background:var(--surface); color:var(--muted); padding:9px 12px; border-radius:999px; }
+    .filter.active { color:#16140d; background:var(--accent); border-color:transparent; font-weight:800; }
+    .bottom-nav {
+      position:fixed; z-index:30; left:50%; bottom:0; transform:translateX(-50%);
+      width:min(100%, 880px); display:grid; grid-template-columns:repeat(4,1fr);
+      padding:8px 8px var(--safe-bottom); background:color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter:blur(18px); border-top:1px solid var(--border);
+    }
+    .nav-btn { border:0; background:transparent; color:var(--muted); padding:8px 4px; border-radius:12px; font-size:.72rem; }
+    .nav-btn span { display:block; font-size:1.25rem; margin-bottom:2px; }
+    .nav-btn.active { color:var(--accent); background:var(--surface); }
+    .case-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .case-header .back { flex:0 0 auto; }
+    .case-header h2 { margin:0; font-size:1.6rem; }
+    .case-header small { color:var(--muted); }
+    .paper {
+      background: var(--paper); color: var(--ink); padding: 22px; border-radius: 4px 18px 5px 10px;
+      box-shadow: 0 15px 35px rgba(0,0,0,.26); transform: rotate(-.25deg); position:relative;
+      font-family: Georgia, serif; line-height:1.65;
+    }
+    .paper::before { content:""; width:46px; height:14px; background:rgba(255,255,255,.34); position:absolute; left:42%; top:-7px; transform:rotate(2deg); }
+    .blank { display:inline-block; padding:0 5px; border-bottom:2px solid var(--ink); min-width:54px; font-family:ui-monospace, monospace; font-weight:800; }
+    .blank.filled { color:#7b251f; }
+    .game-layout { display:grid; gap:16px; margin-top:20px; }
+    .game-panel { padding:17px; }
+    .word-grid {
+      display:grid; gap:3px; width:100%; aspect-ratio:1; touch-action:none; user-select:none;
+      background:#0b0c09; padding:8px; border-radius:16px; border:1px solid var(--border);
+    }
+    body.paper-mode .word-grid { background:#bfb59f; }
+    .letter {
+      min-width:0; border:0; border-radius:6px; background:var(--surface-2); color:var(--text);
+      display:grid; place-items:center; padding:0; font-weight:850; font-size:clamp(.62rem, 2.7vw, 1rem);
+      aspect-ratio:1;
+    }
+    .letter.selecting { background:rgba(208,169,77,.45); }
+    .letter.found { background:var(--accent); color:#16140d; }
+    .letter.leftover { background:#f0e4bd; color:#211e15; box-shadow:inset 0 0 0 1px rgba(0,0,0,.16); }
+    .word-list { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .word-item { padding:10px; border-radius:12px; border:1px solid var(--border); background:var(--surface-2); font-family:ui-monospace,monospace; text-align:center; }
+    .word-item.found { text-decoration:line-through; color:var(--success); }
+    .word-item.missing-found { color:var(--accent); border-color:var(--accent); }
+    .hint { color:var(--muted); line-height:1.5; font-size:.9rem; }
+    .stage { margin-top:16px; padding:18px; }
+    .stage.locked { opacity:.52; }
+    .choice-grid { display:grid; gap:8px; }
+    .choice { text-align:left; border:1px solid var(--border); background:var(--surface-2); padding:12px; border-radius:12px; }
+    .choice.correct { border-color:var(--success); }
+    .cipher { font-family:ui-monospace,monospace; font-size:1.25rem; letter-spacing:.12em; color:var(--accent); overflow-wrap:anywhere; }
+    .field { width:100%; border:1px solid var(--border); background:var(--surface-2); color:var(--text); border-radius:12px; padding:13px; }
+    .form-grid { display:grid; gap:10px; }
+    .reveal { border-left:4px solid var(--success); }
+    .reveal p { color:var(--muted); line-height:1.65; }
+    details { border-top:1px solid var(--border); margin-top:14px; padding-top:12px; }
+    details li { margin-bottom:8px; }
+    .mini-grid { display:grid; gap:14px; }
+    .mini-card { padding:19px; }
+    .mini-card h3 { margin-top:0; }
+    .archive-grid { display:grid; gap:12px; }
+    .archive-row { padding:16px; display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .archive-row small { color:var(--muted); }
+    .settings-list { display:grid; gap:12px; }
+    .setting { padding:16px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .setting p { margin:4px 0 0; color:var(--muted); font-size:.85rem; }
+    .switch { width:48px; height:28px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); padding:3px; }
+    .switch::after { content:""; display:block; width:20px; height:20px; border-radius:50%; background:var(--muted); transition:.2s; }
+    .switch.on { background:var(--accent); }
+    .switch.on::after { transform:translateX(20px); background:#17150e; }
+    .toast {
+      position:fixed; left:50%; bottom:105px; transform:translate(-50%,20px); z-index:50;
+      width:min(calc(100% - 32px),520px); padding:13px 15px; border-radius:14px;
+      background:#292d22; color:#fff; border:1px solid rgba(255,255,255,.15); opacity:0; pointer-events:none; transition:.22s;
+      box-shadow:var(--shadow); text-align:center;
+    }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:60; display:none; place-items:end center; padding:18px; }
+    .modal-backdrop.open { display:grid; }
+    .modal { width:min(100%,560px); background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:22px; box-shadow:var(--shadow); }
+    .modal h3 { margin-top:0; }
+    .source-note { font-size:.82rem; color:var(--muted); line-height:1.5; }
+    .empty { text-align:center; color:var(--muted); padding:36px 16px; }
+    @media (min-width:720px) {
+      main { padding-inline:28px; }
+      .game-layout { grid-template-columns:1.2fr .8fr; align-items:start; }
+      .mini-grid { grid-template-columns:1fr 1fr; }
+      .case-list { grid-template-columns:1fr 1fr; }
+      .case-list .case-card:first-child { grid-column:1 / -1; }
+    }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+    body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after { animation:none!important; transition:none!important; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">EO</div>
+        <div><strong>EXPEDIENTE OCULTO</strong><small>Cada palabra es una pista</small></div>
+      </div>
+      <button class="icon-btn" id="installTop" aria-label="Instalar aplicación">↓</button>
+    </header>
+
+    <main>
+      <section class="screen active" id="screen-home">
+        <article class="hero">
+          <div class="eyebrow">Archivo criminal interactivo</div>
+          <h1>Expediente<br>Oculto</h1>
+          <p>Investiga casos reales mediante sopas de letras, mensajes cifrados y deducción. Los hechos mandan. El morbo barato se queda fuera, milagrosamente.</p>
+          <div class="actions">
+            <button class="btn" data-nav="cases">Abrir expedientes</button>
+            <button class="btn secondary" data-nav="minigames">Minijuegos</button>
+          </div>
+        </article>
+        <div class="stats" id="homeStats"></div>
+        <div class="section-head"><div><div class="eyebrow">Continúa investigando</div><h2>Expedientes</h2></div></div>
+        <div class="case-list" id="homeCases"></div>
+      </section>
+
+      <section class="screen" id="screen-cases">
+        <div class="section-head"><div><div class="eyebrow">Archivo general</div><h2>Expedientes reales</h2><p>Primera colección jugable.</p></div></div>
+        <div class="filter-row" id="caseFilters">
+          <button class="filter active" data-filter="all">Todos</button>
+          <button class="filter" data-filter="pending">Pendientes</button>
+          <button class="filter" data-filter="solved">Resueltos</button>
+        </div>
+        <div class="case-list" id="caseList" style="margin-top:14px"></div>
+      </section>
+
+      <section class="screen" id="screen-case"></section>
+
+      <section class="screen" id="screen-minigames">
+        <div class="section-head"><div><div class="eyebrow">Entrenamiento</div><h2>Minijuegos</h2><p>Para que las neuronas no se declaren en huelga.</p></div></div>
+        <div class="mini-grid">
+          <article class="card mini-card">
+            <div class="eyebrow">Cifrado César</div><h3>Retrocede tres letras</h3>
+            <p class="cipher">FDGD SODEUD HV XQD SLVWD</p>
+            <input class="field" id="caesarInput" autocomplete="off" placeholder="Escribe el mensaje descifrado" />
+            <div class="actions"><button class="btn" id="checkCaesar">Comprobar</button></div>
+          </article>
+          <article class="card mini-card">
+            <div class="eyebrow">Código A1Z26</div><h3>Números por letras</h3>
+            <p class="cipher">5-24-16-5-4-9-5-14-20-5</p>
+            <input class="field" id="a1Input" autocomplete="off" placeholder="Palabra oculta" />
+            <div class="actions"><button class="btn" id="checkA1">Comprobar</button></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-archive">
+        <div class="section-head"><div><div class="eyebrow">Tu investigación</div><h2>Mi archivo</h2><p>Progreso guardado en este dispositivo.</p></div></div>
+        <div class="archive-grid" id="archiveList"></div>
+      </section>
+
+      <section class="screen" id="screen-settings">
+        <div class="section-head"><div><div class="eyebrow">Preferencias</div><h2>Ajustes</h2></div></div>
+        <div class="settings-list">
+          <article class="card setting"><div><strong>Modo papel</strong><p>Cambia el archivo oscuro por una mesa de documentación clara.</p></div><button class="switch" id="paperSwitch" aria-label="Alternar modo papel"></button></article>
+          <article class="card setting"><div><strong>Reducir animaciones</strong><p>Menos movimiento, misma investigación.</p></div><button class="switch" id="motionSwitch" aria-label="Reducir animaciones"></button></article>
+          <article class="card setting"><div><strong>Instalar aplicación</strong><p>Añádela a la pantalla de inicio cuando el navegador lo permita.</p></div><button class="btn secondary" id="installSettings">Instalar</button></article>
+          <article class="card setting"><div><strong>Borrar progreso</strong><p>Reinicia todos los expedientes y minijuegos.</p></div><button class="btn danger" id="resetProgress">Borrar</button></article>
+        </div>
+        <p class="source-note" style="margin-top:20px">Los expedientes distinguen hechos documentados, decisiones judiciales y debates históricos. No se usan imágenes gráficas.</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button class="nav-btn active" data-nav="home"><span>⌂</span>Inicio</button>
+      <button class="nav-btn" data-nav="cases"><span>▤</span>Casos</button>
+      <button class="nav-btn" data-nav="minigames"><span>⌘</span>Juegos</button>
+      <button class="nav-btn" data-nav="archive"><span>◫</span>Archivo</button>
+    </nav>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
+  <script src="app.js"></script>
+</body>
+</html>
