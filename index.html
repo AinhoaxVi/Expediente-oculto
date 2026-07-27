@@ -8,9 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Expediente" />
   <meta name="description" content="Expediente Oculto: casos reales, sopas de letras y puzles de investigación." />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
   <title>Expediente Oculto</title>
   <style>
     :root {
@@ -167,6 +166,8 @@
       aspect-ratio:1;
     }
     .letter.selecting { background:rgba(208,169,77,.45); }
+    .letter.hint-cell { outline:3px solid var(--accent-2); outline-offset:1px; animation:pulseHint .8s ease infinite alternate; }
+    @keyframes pulseHint { to { transform:scale(.88); } }
     .letter.found { background:var(--accent); color:#16140d; }
     .letter.leftover { background:#f0e4bd; color:#211e15; box-shadow:inset 0 0 0 1px rgba(0,0,0,.16); }
     .word-list { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
@@ -212,6 +213,34 @@
     .modal h3 { margin-top:0; }
     .source-note { font-size:.82rem; color:var(--muted); line-height:1.5; }
     .empty { text-align:center; color:var(--muted); padding:36px 16px; }
+    .demo-badge { display:inline-flex; align-items:center; gap:7px; margin-top:12px; padding:7px 10px; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); color:var(--muted); font-size:.76rem; }
+    .story-intro p { margin:0 0 14px; }
+    .story-intro p:last-child { margin-bottom:0; }
+    .answer-block { display:grid; gap:10px; margin-top:12px; }
+    .leftover-wrap { display:grid; gap:12px; }
+    .leftover-strip { padding:14px; border:1px dashed var(--border); border-radius:14px; background:var(--surface-2); font-family:ui-monospace,monospace; letter-spacing:.15em; line-height:1.8; overflow-wrap:anywhere; color:var(--accent); }
+    .status-ok { color:var(--success); font-weight:800; }
+    .code-stack { display:grid; gap:12px; margin-top:14px; }
+    .code-card { padding:16px; border-radius:16px; border:1px solid var(--border); background:var(--surface-2); }
+    .code-card.locked { opacity:.48; }
+    .code-card.solved { border-color:color-mix(in srgb,var(--success) 65%,var(--border)); }
+    .code-card h4 { margin:5px 0 8px; font-family:Georgia,serif; font-size:1.05rem; }
+    .evidence-list { display:grid; gap:10px; margin-top:14px; }
+    .evidence { display:flex; gap:11px; align-items:flex-start; padding:13px; border-radius:14px; border:1px solid var(--border); background:var(--surface-2); }
+    .evidence .seal { flex:0 0 28px; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:var(--accent); color:#17150e; font-weight:900; }
+    .evidence.locked { opacity:.42; filter:blur(.8px); user-select:none; }
+    .evidence p { margin:2px 0 0; color:var(--muted); line-height:1.45; }
+    .story-section { padding:16px 0; border-top:1px solid var(--border); }
+    .story-section:first-of-type { border-top:0; padding-top:4px; }
+    .story-section h4 { margin:0 0 8px; color:var(--accent); font-family:Georgia,serif; font-size:1.12rem; }
+    .story-section p { margin:0; color:var(--muted); line-height:1.72; }
+    .score-panel { display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:center; margin:14px 0; padding:14px; border-radius:16px; background:var(--surface-2); border:1px solid var(--border); }
+    .score-number { font-size:2rem; font-family:Georgia,serif; color:var(--accent); font-weight:900; }
+    .field-label { display:grid; gap:6px; color:var(--muted); font-size:.86rem; }
+    .field-label .field { color:var(--text); font-size:1rem; }
+    .feedback { min-height:1.4em; color:var(--muted); font-size:.88rem; }
+    .mini-done { color:var(--success); font-weight:800; }
+
     @media (min-width:720px) {
       main { padding-inline:28px; }
       .game-layout { grid-template-columns:1.2fr .8fr; align-items:start; }
@@ -236,9 +265,9 @@
     <main>
       <section class="screen active" id="screen-home">
         <article class="hero">
-          <div class="eyebrow">Archivo criminal interactivo</div>
+          <div class="eyebrow">Demo V2 · 3 de 80 expedientes</div>
           <h1>Expediente<br>Oculto</h1>
-          <p>Investiga casos reales mediante sopas de letras, mensajes cifrados y deducción. Los hechos mandan. El morbo barato se queda fuera, milagrosamente.</p>
+          <p>Investiga casos reales mediante sopas de letras, mensajes cifrados, documentos y deducción libre. Esta es la demo técnica: pequeña a propósito, pero ya sin respuestas regaladas.</p>
           <div class="actions">
             <button class="btn" data-nav="cases">Abrir expedientes</button>
             <button class="btn secondary" data-nav="minigames">Minijuegos</button>
@@ -250,7 +279,7 @@
       </section>
 
       <section class="screen" id="screen-cases">
-        <div class="section-head"><div><div class="eyebrow">Archivo general</div><h2>Expedientes reales</h2><p>Primera colección jugable.</p></div></div>
+        <div class="section-head"><div><div class="eyebrow">Archivo general</div><h2>Expedientes reales</h2><p>Demo V2: tres casos reales para probar todas las mecánicas.</p></div></div>
         <div class="filter-row" id="caseFilters">
           <button class="filter active" data-filter="all">Todos</button>
           <button class="filter" data-filter="pending">Pendientes</button>
@@ -262,21 +291,8 @@
       <section class="screen" id="screen-case"></section>
 
       <section class="screen" id="screen-minigames">
-        <div class="section-head"><div><div class="eyebrow">Entrenamiento</div><h2>Minijuegos</h2><p>Para que las neuronas no se declaren en huelga.</p></div></div>
-        <div class="mini-grid">
-          <article class="card mini-card">
-            <div class="eyebrow">Cifrado César</div><h3>Retrocede tres letras</h3>
-            <p class="cipher">FDGD SODEUD HV XQD SLVWD</p>
-            <input class="field" id="caesarInput" autocomplete="off" placeholder="Escribe el mensaje descifrado" />
-            <div class="actions"><button class="btn" id="checkCaesar">Comprobar</button></div>
-          </article>
-          <article class="card mini-card">
-            <div class="eyebrow">Código A1Z26</div><h3>Números por letras</h3>
-            <p class="cipher">5-24-16-5-4-9-5-14-20-5</p>
-            <input class="field" id="a1Input" autocomplete="off" placeholder="Palabra oculta" />
-            <div class="actions"><button class="btn" id="checkA1">Comprobar</button></div>
-          </article>
-        </div>
+        <div class="section-head"><div><div class="eyebrow">Academia de códigos</div><h2>Minijuegos</h2><p>Cuatro sistemas de cifrado para practicar antes de abrir un expediente.</p></div></div>
+        <div class="mini-grid" id="miniGrid"></div>
       </section>
 
       <section class="screen" id="screen-archive">
@@ -305,6 +321,293 @@
   </div>
   <div class="toast" id="toast"></div>
   <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"></div></div>
-  <script src="app.js"></script>
+  <script>
+const CASES = [{"id":"lincoln-1865","number":"001","title":"El palco presidencial","date":"14 de abril de 1865","location":"Washington D. C., Estados Unidos","teaser":"Una función teatral, un actor conocido y una huida preparada en plena posguerra.","difficulty":"Iniciación","intro":["Washington celebraba el final prácticamente decidido de la Guerra Civil. Cinco días antes, Robert E. Lee había entregado su ejército en Appomattox, y el presidente Abraham Lincoln buscaba unas horas de descanso. La noche del 14 de abril de 1865 acudió al [TEATRO] Ford para ver la comedia [OBRA] acompañado por Mary Lincoln y dos invitados.","El presidente se acomodó en el [PALCO] reservado, decorado con banderas y visible desde buena parte de la sala. La seguridad era limitada. Entre bastidores se movían trabajadores, intérpretes y personas conocidas por la dirección. Uno de ellos era un célebre [ACTOR] que había actuado allí en otras ocasiones y cuya presencia no despertaba sospechas.","El atacante conocía el edificio y calculó el momento en que una de las frases de la obra provocaría una carcajada general. Después del disparo saltó hacia el escenario, cruzó la zona de representación y organizó su [ESCAPE] por una puerta trasera que conducía a un callejón.","La investigación empezó mientras el [PRESIDENTE] seguía inconsciente en una pensión situada frente al teatro. Las autoridades descubrieron que el agresor era un simpatizante [CONFEDERADO] y que el crimen formaba parte de un plan más amplio. En la lista de palabras hay una que no aparece en la sopa: identifica el arma empleada."],"words":[{"answer":"OBRA","mask":"O _ R A"},{"answer":"PALCO","mask":"P A _ C O"},{"answer":"ACTOR","mask":"A C _ O R"},{"answer":"TEATRO","mask":"T E A _ R O"},{"answer":"ESCAPE","mask":"E S C _ P E"},{"answer":"PRESIDENTE","mask":"P R E S I D _ N T E"},{"answer":"CONFEDERADO","mask":"C O N F E D E R A _ O"},{"answer":"DERRINGER","mask":"D E R R _ N G E R","missing":true}],"grid":["JOHNWILPKESBP","OOTHXIERLBOVA","IPOQLPVERKRHL","KICBAFASJKTEC","ACVCRTGIZBAMO","WASSHINDGTEON","XEYENDSEUNTOE","RLUPTURNUGARJ","LLJOVZFTLJYOA","SCNFOVQESNYTR","DSADEIEEZEQCB","CONFEDERADOAO","LIPVMLVTCNKRW"],"missingAnswer":"DERRINGER","missingAliases":["DERRINGER","PISTOLA DERRINGER","DERRINGER 44","PISTOLA 44 DERRINGER"],"leftover":{"culprit":"John Wilkes Booth","culpritAliases":["JOHN WILKES BOOTH","BOOTH"],"place":"Washington","placeAliases":["WASHINGTON","WASHINGTON DC","WASHINGTON D C"]},"final":{"culprit":"John Wilkes Booth","culpritAliases":["JOHN WILKES BOOTH","BOOTH"],"weapon":"Derringer","weaponAliases":["DERRINGER","PISTOLA DERRINGER","DERRINGER 44","PISTOLA 44 DERRINGER"],"place":"Teatro Ford","placeAliases":["TEATRO FORD","FORDS THEATRE","FORD THEATRE","FORDS THEATER","TEATRO FORDS"]},"codes":[{"type":"Cifrado César · −3","title":"La escena exacta","text":"SDOFR SUHVLGHQFLDO","answer":"PALCO PRESIDENCIAL","hint":"Cada letra está tres posiciones por delante de la original.","reveal":"El disparo se produjo dentro del palco presidencial del Teatro Ford."},{"type":"Código A1Z26","title":"La salida","text":"2-1-16-20-9-19-20 / 1-12-12-5-25","answer":"BAPTIST ALLEY","hint":"A=1, B=2, C=3. La barra separa dos palabras.","reveal":"Booth salió por Baptist Alley, el callejón situado detrás del teatro."},{"type":"Atbash","title":"El destino de la víctima","text":"KVGVIHVM SLFHV","answer":"PETERSEN HOUSE","hint":"A se cambia por Z, B por Y, C por X y así sucesivamente.","reveal":"Lincoln fue trasladado a Petersen House, enfrente del teatro, donde murió a la mañana siguiente."},{"type":"Código Morse","title":"La profesión del sospechoso","text":".- -.-. - --- .-.","answer":"ACTOR","hint":"Separa cada grupo de puntos y rayas como una letra distinta.","reveal":"El responsable era actor, famoso y conocido en el propio Teatro Ford."}],"clues":[{"unlock":0,"title":"Acceso","text":"El responsable podía moverse por el teatro sin llamar demasiado la atención porque era intérprete y amigo del propietario."},{"unlock":0,"title":"Arma ausente","text":"La palabra que no aparece en la sopa designa una pistola pequeña, de un solo disparo y calibre .44."},{"unlock":1,"title":"Lugar del ataque","text":"No confundas el edificio donde ocurrió el disparo con la casa a la que trasladaron después a Lincoln."},{"unlock":2,"title":"Ruta de fuga","text":"El callejón descifrado demuestra que el agresor salió por la parte trasera y tenía un caballo preparado."},{"unlock":3,"title":"Consecuencia","text":"Petersen House forma parte del desenlace, pero no es la escena inicial del crimen."},{"unlock":4,"title":"Conclusión","text":"La identidad extraída de las letras sobrantes coincide con el actor confederado que conocía el Teatro Ford."}],"story":[{"title":"El contexto","body":"El 14 de abril de 1865, Washington vivía entre celebraciones y agotamiento. La rendición del ejército de Robert E. Lee el 9 de abril se interpretaba como el principio del fin de la Guerra Civil estadounidense. Abraham Lincoln, después de cuatro años de conflicto, decidió acudir esa noche al Teatro Ford. La obra era Our American Cousin, una comedia popular. Lincoln ocupó el palco presidencial con Mary Lincoln, el mayor Henry Rathbone y Clara Harris."},{"title":"La preparación","body":"John Wilkes Booth era un actor conocido, procedente de una familia célebre en los escenarios. También era un firme simpatizante confederado, defensor de la esclavitud y enemigo político de Lincoln. Durante meses había participado en un proyecto para secuestrar al presidente. Cuando la guerra llegaba a su final, transformó aquel plan en una conspiración para asesinar a varios dirigentes del Gobierno. El propio Booth supo que Lincoln iría al teatro y, por su relación con el lugar, pudo entrar y desplazarse sin resultar extraño."},{"title":"El ataque y la huida","body":"Aproximadamente a las 22:15, Booth accedió al palco y disparó a Lincoln por detrás con una pistola Derringer de calibre .44 y un solo tiro. También llevaba una daga. El presidente perdió el conocimiento y no volvió a despertarse. Booth saltó al escenario, cruzó el teatro y escapó por una puerta que daba a Baptist Alley, donde tenía preparado un caballo. Durante la fuga se reunió con David Herold y recorrió Maryland y Virginia durante doce días."},{"title":"La atención a Lincoln","body":"El doctor Charles Leale, que se encontraba entre el público, fue uno de los primeros en atender al presidente. Determinó que la herida era mortal y decidió trasladarlo a la cama disponible más cercana. Varias personas llevaron a Lincoln a la Petersen Boarding House, justo enfrente del Teatro Ford. Murió allí el 15 de abril de 1865 a las 7:22 de la mañana. El teatro quedó bajo control militar mientras comenzaba una investigación de enorme alcance."},{"title":"La investigación","body":"Las autoridades detuvieron e interrogaron a cientos de personas. Booth fue localizado el 26 de abril en la granja Garrett, en Virginia, y murió durante el intento de captura. Ocho acusados fueron juzgados por un tribunal militar por su participación en la conspiración; cuatro fueron ejecutados y otros recibieron penas de prisión. El expediente histórico distingue entre el autor material del disparo, John Wilkes Booth, y la red de colaboradores implicada en los planes de secuestro, asesinato y huida."},{"title":"Resultado del expediente","body":"La solución documentada es John Wilkes Booth como autor del disparo, una pistola Derringer como arma y el palco presidencial del Teatro Ford como escena del ataque. Petersen House pertenece al desenlace, no al lugar del disparo. La historia se presenta sin recreaciones gráficas y separando los hechos confirmados de los detalles discutidos sobre la lesión de Booth durante su huida."}],"sources":[{"label":"National Park Service: preguntas sobre el asesinato","url":"https://home.nps.gov/foth/learn/historyculture/faq-the-assassination.htm"},{"label":"National Park Service: los conspiradores de Lincoln","url":"https://home.nps.gov/foth/learn/historyculture/the-lincoln-conspirators.htm"},{"label":"National Park Service: la huida del asesino","url":"https://home.nps.gov/foth/learn/historyculture/the-assassin-s-escape.htm"}]},{"id":"sarajevo-1914","number":"002","title":"El giro equivocado","date":"28 de junio de 1914","location":"Sarajevo, Bosnia y Herzegovina","teaser":"Un primer atentado fallido, una ruta confusa y un encuentro que aceleró una crisis europea.","difficulty":"Intermedio","intro":["El 28 de junio de 1914, el archiduque Francisco Fernando, heredero del Imperio austrohúngaro, visitó [SARAJEVO] junto a su esposa Sophie. La comitiva recorrió la ciudad en [COCHE] con una protección sorprendentemente limitada, pese a las tensiones nacionalistas existentes en Bosnia.","Varios jóvenes conspiradores se distribuyeron a lo largo del recorrido. Uno de ellos lanzó una [BOMBA] contra la caravana, pero el artefacto rebotó y explotó detrás del vehículo principal. El archiduque continuó hasta el Ayuntamiento y decidió después visitar a los heridos.","La nueva [RUTA] no fue comunicada con claridad a todos los conductores. Cerca del [PUENTE] Latino, el coche tomó una dirección incorrecta y tuvo que frenar para corregirla. A pocos metros se encontraba otro conspirador, que aprovechó la detención.","La víctima era el [HEREDERO] de una de las mayores potencias europeas. La investigación local detuvo a varios participantes y reconstruyó una red de apoyo nacionalista. En la lista hay una palabra ausente: corresponde al arma utilizada en el segundo ataque."],"words":[{"answer":"SARAJEVO","mask":"S A R A _ E V O"},{"answer":"COCHE","mask":"C O _ H E"},{"answer":"BOMBA","mask":"B O M _ A"},{"answer":"RUTA","mask":"R _ T A"},{"answer":"PUENTE","mask":"P U E _ T E"},{"answer":"HEREDERO","mask":"H E R E D _ R O"},{"answer":"CONSPIRADOR","mask":"C O N S P I R A _ O R"},{"answer":"PISTOLA","mask":"P I S _ O L A","missing":true}],"grid":["GASPVRILOPRIN","CIPAUXKSNEFQQ","EOCWREHVTRLCR","SRDPNANQSBCOU","FECHAFJTJRFNT","SDARAJEEEVOSA","XESKDEADVVDPQ","FRYCCSHPGOUIM","HECQKEEBMOARD","SHOUNWUUSWMAR","OCOCHEVFQGQDZ","FDCMWDZDAVAON","VCBOMBAQJIYRD"],"missingAnswer":"PISTOLA","missingAliases":["PISTOLA","PISTOLA 1910","PISTOLA MODELO 1910","BROWNING 1910","FN 1910"],"leftover":{"culprit":"Gavrilo Princip","culpritAliases":["GAVRILO PRINCIP","PRINCIP"],"place":"Sarajevo","placeAliases":["SARAJEVO"]},"final":{"culprit":"Gavrilo Princip","culpritAliases":["GAVRILO PRINCIP","PRINCIP"],"weapon":"Pistola modelo 1910","weaponAliases":["PISTOLA","PISTOLA 1910","PISTOLA MODELO 1910","BROWNING 1910","FN 1910","PISTOLA BELGA 1910"],"place":"Sarajevo","placeAliases":["SARAJEVO","PUENTE LATINO","CERCA DEL PUENTE LATINO"]},"codes":[{"type":"Cifrado César · −3","title":"El punto de encuentro","text":"SXHQWH ODWLQR","answer":"PUENTE LATINO","hint":"Retrocede tres posiciones en el alfabeto.","reveal":"El automóvil se detuvo cerca del Puente Latino cuando intentaba corregir la ruta."},{"type":"Código Morse","title":"El arma concreta","text":".--. .. ... - --- .-.. .- / .---- ----. .---- -----","answer":"PISTOLA 1910","hint":"La barra separa la palabra del número. Los números también tienen código Morse.","reveal":"Princip utilizó una pistola automática belga Modelo 1910."},{"type":"Mensaje invertido","title":"La ciudad","text":"OVEJARAS","answer":"SARAJEVO","hint":"Léelo de derecha a izquierda.","reveal":"Los dos ataques de la mañana ocurrieron en Sarajevo."},{"type":"Atbash","title":"La pieza que conecta todo","text":"XLMHKRIZWLI","answer":"CONSPIRADOR","hint":"Sustituye A por Z, B por Y y continúa desde los extremos del alfabeto.","reveal":"El tirador no actuó como un viandante casual: formaba parte de un grupo de conspiradores."}],"clues":[{"unlock":0,"title":"Dos ataques","text":"La bomba del primer intento y los disparos posteriores fueron realizados por personas distintas."},{"unlock":0,"title":"La palabra ausente","text":"El arma que debes escribir es la palabra incompleta de la lista que nunca aparece en la cuadrícula."},{"unlock":1,"title":"Ubicación","text":"El coche frenó cerca del Puente Latino, no en Belgrado ni en Viena."},{"unlock":2,"title":"No confundas responsables","text":"Nedeljko Čabrinović lanzó la bomba. El autor de los disparos fue otro conspirador."},{"unlock":3,"title":"Identidad","text":"Las letras sobrantes forman el nombre del joven detenido inmediatamente después de disparar."},{"unlock":4,"title":"Conclusión","text":"La respuesta final debe combinar al tirador, la pistola Modelo 1910 y Sarajevo."}],"story":[{"title":"Una visita cargada de tensión","body":"Francisco Fernando, heredero del trono austrohúngaro, y su esposa Sophie llegaron a Sarajevo el 28 de junio de 1914. Bosnia y Herzegovina había sido anexionada por Austria-Hungría en 1908, una decisión rechazada por numerosos nacionalistas eslavos del sur. La fecha de la visita tenía además un fuerte significado para la identidad serbia. La comitiva recorrió la ciudad en automóviles abiertos y con una seguridad que, vista después, resultó insuficiente."},{"title":"El primer atentado","body":"Varios conspiradores esperaban a lo largo del itinerario. Nedeljko Čabrinović lanzó una bomba contra el coche del archiduque cerca del río Miljacka. El artefacto rebotó en el vehículo y explotó bajo otro automóvil de la comitiva, causando heridos. Čabrinović fue detenido. Francisco Fernando llegó al Ayuntamiento, protestó por el ataque y, tras la recepción, decidió visitar a los heridos en el hospital."},{"title":"La ruta y la oportunidad","body":"El plan era modificar el recorrido para evitar el centro de la ciudad, pero la instrucción no llegó correctamente a todos. El conductor tomó la ruta anterior y, al recibir la orden de corregirla, frenó y comenzó a maniobrar cerca del Puente Latino. Gavrilo Princip, uno de los conspiradores, se encontraba allí. La coincidencia no fue un encuentro totalmente fortuito: Princip seguía en la zona después del fracaso del primer ataque, pero la detención del coche le dio la oportunidad inmediata."},{"title":"Los disparos","body":"Princip disparó dos veces con una pistola automática belga Modelo 1910. Francisco Fernando y Sophie resultaron mortalmente heridos. Princip fue reducido y detenido. Tenía 19 años, por lo que la legislación austrohúngara impidió que fuera condenado a muerte; recibió una pena de veinte años y murió en prisión en 1918. Otros implicados fueron juzgados y condenados por su participación en la conspiración y en el suministro de armas."},{"title":"La red política","body":"Princip estaba vinculado al movimiento nacionalista Joven Bosnia. Las armas y la preparación llegaron mediante redes clandestinas relacionadas con nacionalistas serbios y con miembros de la organización conocida como Mano Negra. La responsabilidad exacta del Gobierno serbio y el conocimiento que tenían sus autoridades han sido objeto de discusión histórica, por lo que el expediente evita presentar como hecho una cadena de mando que no está demostrada del mismo modo que la autoría material."},{"title":"De Sarajevo a la guerra","body":"El asesinato no causó por sí solo la Primera Guerra Mundial, pero desencadenó la Crisis de Julio. Austria-Hungría presentó un ultimátum a Serbia; las alianzas, movilizaciones y decisiones políticas posteriores extendieron el conflicto. La solución del expediente es Gavrilo Princip como autor de los disparos, una pistola Modelo 1910 como arma y Sarajevo como lugar. Čabrinović pertenece al primer ataque con bomba, una distinción esencial para no resolver el caso por simple asociación."}],"sources":[{"label":"National WWI Museum: cronología del 28 de junio de 1914","url":"https://www.theworldwar.org/learn/about-wwi/june-28-1914"},{"label":"National WWI Museum: pistola automática belga Modelo 1910","url":"https://www.theworldwar.org/learn/about-wwi/spotlight-belgian-automatic-pistol"}]},{"id":"mlk-1968","number":"003","title":"La habitación frente al motel","date":"4 de abril de 1968","location":"Memphis, Tennessee, Estados Unidos","teaser":"Un balcón, una pensión cercana y una fuga internacional seguida por las autoridades.","difficulty":"Intermedio","intro":["Martin Luther King Jr. llegó a [MEMPHIS] para apoyar la huelga de los trabajadores municipales de saneamiento. Se alojaba en la habitación 306 del Motel [LORRAINE], un establecimiento ligado a la historia de la comunidad afroamericana de la ciudad.","La tarde del 4 de abril de 1968 salió al [BALCON] exterior mientras se preparaba para acudir a cenar. Frente al motel había una pensión con habitaciones y un baño común desde el que se podía observar el edificio. Poco después del disparo, unos testigos vieron un bulto abandonado cerca de la entrada de un comercio.","La investigación relacionó aquel paquete con una habitación alquilada bajo un nombre falso. También siguió un [MUSTANG] blanco encontrado en Atlanta y reconstruyó una huida que pasó por [CANADA] antes de continuar hacia Europa.","El sospechoso se convirtió en [FUGITIVO] internacional y fue detenido en un aeropuerto de Londres. En la lista de palabras hay una que no aparece en la sopa: identifica el tipo de arma que las autoridades vincularon al ataque."],"words":[{"answer":"BALCON","mask":"B A L _ O N"},{"answer":"LORRAINE","mask":"L O R R A _ N E"},{"answer":"MEMPHIS","mask":"M E M _ H I S"},{"answer":"MUSTANG","mask":"M U S _ A N G"},{"answer":"PENSION","mask":"P E N S _ O N"},{"answer":"FUGITIVO","mask":"F U G I _ I V O"},{"answer":"CANADA","mask":"C A N _ D A"},{"answer":"RIFLE","mask":"R I _ L E","missing":true}],"grid":["JAMBMESEARLRA","YXELAUCMCBLZO","ZWMOVLCABPEVE","NJPRSGCSNNFOG","SUHRGWIOIAVWE","MOIATELLNIDOR","RASIINEXTNTAO","KVFNBUAIFFNLA","HDLEBFGSERFQQ","AZRNIUNEMEODY","URLFFWECLWRHN","YGNATSUMGGBLK","HIWQENOISNEPZ"],"missingAnswer":"RIFLE","missingAliases":["RIFLE","RIFLE REMINGTON","REMINGTON 760","RIFLE REMINGTON 760"],"leftover":{"culprit":"James Earl Ray","culpritAliases":["JAMES EARL RAY","JAMES RAY","RAY"],"place":"Motel Lorraine","placeAliases":["MOTEL LORRAINE","LORRAINE MOTEL","LORRAINE"]},"final":{"culprit":"James Earl Ray","culpritAliases":["JAMES EARL RAY","JAMES RAY","RAY"],"weapon":"Rifle","weaponAliases":["RIFLE","RIFLE REMINGTON","REMINGTON 760","RIFLE REMINGTON 760"],"place":"Motel Lorraine","placeAliases":["MOTEL LORRAINE","LORRAINE MOTEL","LORRAINE","BALCON DEL MOTEL LORRAINE","BALCON HABITACION 306"]},"codes":[{"type":"Cifrado César · −3","title":"El escenario","text":"PRWHO ORUUDLQH","answer":"MOTEL LORRAINE","hint":"Retrocede tres letras en cada carácter.","reveal":"King fue atacado en el balcón exterior del Motel Lorraine."},{"type":"Código A1Z26","title":"El objeto del paquete","text":"18-9-6-12-5","answer":"RIFLE","hint":"Convierte cada número en su posición alfabética.","reveal":"El paquete abandonado contenía un rifle y objetos vinculados a James Earl Ray."},{"type":"Código Morse","title":"El final de la fuga","text":".-.. --- -. -.. .-. . ...","answer":"LONDRES","hint":"Cada espacio separa una letra.","reveal":"Ray fue detenido por autoridades británicas en Londres el 8 de junio de 1968."},{"type":"Mensaje invertido","title":"La habitación","text":"603 NOICATIBAH","answer":"HABITACION 306","hint":"Léelo completamente de derecha a izquierda, incluidos los números.","reveal":"King se alojaba en la habitación 306, cuya puerta daba al balcón del motel."}],"clues":[{"unlock":0,"title":"Motivo de la visita","text":"King estaba en Memphis apoyando a los trabajadores municipales de saneamiento en huelga."},{"unlock":0,"title":"Pensión","text":"Un hombre alquiló una habitación frente al motel usando el nombre falso John Willard."},{"unlock":1,"title":"Escena","text":"El disparo alcanzó a King en el balcón exterior, no dentro de la habitación 306."},{"unlock":2,"title":"Evidencia abandonada","text":"El bulto hallado cerca de la pensión contenía un rifle y pertenencias que guiaron la investigación."},{"unlock":3,"title":"Fuga","text":"El sospechoso pasó por Canadá, utilizó documentación falsa y terminó detenido en Londres."},{"unlock":4,"title":"Resolución oficial","text":"Ray se declaró culpable en 1969; después intentó retirar su confesión, pero revisiones oficiales posteriores no anularon la condena."}],"story":[{"title":"Por qué estaba King en Memphis","body":"Martin Luther King Jr. viajó a Memphis para apoyar la huelga de trabajadores municipales de saneamiento, iniciada después de la muerte de dos empleados y de años de condiciones laborales injustas. El 3 de abril pronunció su discurso conocido como I’ve Been to the Mountaintop. Se alojaba en la habitación 306 del Motel Lorraine, un establecimiento frecuentado por viajeros y artistas afroamericanos durante la segregación."},{"title":"La tarde del 4 de abril","body":"Alrededor de las seis de la tarde, King salió al balcón exterior de la segunda planta mientras se preparaba para ir a cenar. Un único disparo lo alcanzó. Sus acompañantes señalaron hacia la zona situada frente al motel, donde había una pensión sobre Jim’s Grill. King fue trasladado al hospital St. Joseph y murió esa misma tarde. La habitación 306 y el balcón quedaron para siempre asociados al crimen."},{"title":"La habitación frente al motel","body":"La investigación determinó que James Earl Ray había aparcado un Ford Mustang blanco en South Main Street y había alquilado una habitación en la pensión bajo el nombre falso John Willard. Desde el baño común existía una línea de visión hacia el motel. Poco después del disparo apareció un paquete abandonado cerca de la entrada de Canipe’s Amusement Company. Contenía un rifle, prismáticos y otros objetos vinculados a Ray."},{"title":"La fuga internacional","body":"Ray abandonó Memphis y el Mustang apareció después en Atlanta. Viajó a Canadá, obtuvo documentación a nombre de Ramon George Sneyd y cruzó el Atlántico. El 8 de junio de 1968 fue detenido en el aeropuerto de Heathrow, en Londres, cuando intentaba salir del Reino Unido. Fue extraditado a Estados Unidos. La persecución convirtió el caso en una investigación internacional de enorme escala."},{"title":"La condena y las retractaciones","body":"En marzo de 1969, Ray se declaró culpable del asesinato y recibió una condena de 99 años, evitando así un juicio completo. Poco después intentó retirar la confesión y sostuvo que había sido utilizado por un hombre llamado Raoul. Durante décadas surgieron alegaciones de conspiración, incluida una demanda civil de la familia King contra Loyd Jowers. El Departamento de Justicia revisó esas acusaciones y concluyó en 2000 que no había pruebas fiables que alteraran la determinación judicial de 1969 respecto a Ray."},{"title":"Cómo lo presenta el juego","body":"El expediente utiliza como solución la resolución judicial y las conclusiones de las investigaciones oficiales: James Earl Ray como responsable condenado, un rifle como arma y el Motel Lorraine como lugar del ataque. También informa de las controversias posteriores en lugar de fingir que nunca existieron. La diferencia entre una conclusión judicial, una hipótesis y una alegación no corroborada forma parte de la investigación, porque la historia real suele ser más incómoda que una respuesta de tres botones."}],"sources":[{"label":"Departamento de Justicia de EE. UU.: revisión de las alegaciones sobre el asesinato","url":"https://www.justice.gov/crt/overview-investigation-allegations-regarding-assassination-dr-martin-luther-king-jr"},{"label":"National Archives: conclusiones sobre el asesinato de Martin Luther King Jr.","url":"https://www.archives.gov/research/jfk/select-committee-report/part-2a.html"},{"label":"National Civil Rights Museum: historia del Lorraine Motel","url":"https://civilrightsmuseum.org/blog/the-famous-lorraine-motel/"}]}];
+const MINIGAMES = [{"id":"caesar","type":"Cifrado César · −3","title":"Retrocede tres letras","text":"FDGD SODEUD HV XQD SLVWD","answer":"CADA PALABRA ES UNA PISTA","hint":"D se convierte en A, E en B y F en C."},{"id":"a1","type":"Código A1Z26","title":"Números por letras","text":"5-24-16-5-4-9-5-14-20-5","answer":"EXPEDIENTE","hint":"A=1 y Z=26."},{"id":"atbash","type":"Atbash","title":"El alfabeto al revés","text":"VCKVWRVMGV LXFOGL","answer":"EXPEDIENTE OCULTO","hint":"A↔Z, B↔Y, C↔X."},{"id":"morse","type":"Código Morse","title":"Puntos y rayas","text":".... ..- . .-.. .-.. .- ...","answer":"HUELLAS","hint":"Cada espacio separa una letra."}];
+const STORAGE_KEY='expedienteOcultoStateV2';
+const defaultState={progress:{},settings:{paper:false,reducedMotion:false},mini:{}};
+let state=loadState();
+let activeCaseId=null;
+let caseFilter='all';
+let deferredInstallPrompt=null;
+
+function clone(value){ return JSON.parse(JSON.stringify(value)); }
+function loadState(){
+  try{
+    const stored=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    return {progress:stored.progress||{},settings:{...defaultState.settings,...(stored.settings||{})},mini:stored.mini||{}};
+  }catch{return clone(defaultState);}
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }
+function progressFor(id){
+  const base={found:[],missingSolved:false,leftoversSolved:false,codesSolved:[],solved:false,hints:0,attempts:0,hintKeys:[]};
+  state.progress[id]={...base,...(state.progress[id]||{})};
+  if(!Array.isArray(state.progress[id].found))state.progress[id].found=[];
+  if(!Array.isArray(state.progress[id].codesSolved))state.progress[id].codesSolved=[];
+  if(!Array.isArray(state.progress[id].hintKeys))state.progress[id].hintKeys=[];
+  return state.progress[id];
+}
+function normalize(text=''){
+  return String(text).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+}
+function matches(value,aliases){ const n=normalize(value); return aliases.some(x=>normalize(x)===n); }
+function pct(c){
+  const p=progressFor(c.id), present=c.words.filter(w=>!w.missing).length;
+  const steps=present+1+1+c.codes.length+1;
+  const done=p.found.length+(p.missingSolved?1:0)+(p.leftoversSolved?1:0)+p.codesSolved.filter(Boolean).length+(p.solved?1:0);
+  return Math.min(100,Math.round(done/steps*100));
+}
+function scoreFor(p){ return Math.max(10,100-(p.hints*8)-(p.attempts*5)); }
+function rankFor(score){
+  if(score>=95)return'Investigador legendario';
+  if(score>=85)return'Detective experto';
+  if(score>=70)return'Inspector';
+  if(score>=50)return'Cadete';
+  return'Novato persistente';
+}
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+function showModal(html){ document.getElementById('modal').innerHTML=html;document.getElementById('modalBackdrop').classList.add('open'); }
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); }
+function refreshGlobal(){ renderHome();renderCases();renderArchive();renderMiniGames();applySettings(); }
+function persistAndRefreshCase(){ saveState();refreshGlobal();if(activeCaseId)renderCase(); }
+
+document.getElementById('modalBackdrop').addEventListener('click',e=>{
+  if(e.target.id==='modalBackdrop'||e.target.closest('[data-close-modal]'))closeModal();
+});
+
+function nav(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`screen-${screen}`)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.nav===screen||(screen==='case'&&b.dataset.nav==='cases')));
+  if(screen==='home')renderHome();
+  if(screen==='cases')renderCases();
+  if(screen==='archive')renderArchive();
+  if(screen==='minigames')renderMiniGames();
+  window.scrollTo({top:0,behavior:state.settings.reducedMotion?'auto':'smooth'});
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(b)nav(b.dataset.nav);});
+
+function caseCard(c){
+  const p=progressFor(c.id);
+  return `<article class="card case-card" data-open-case="${c.id}">
+    <div class="meta">EXPEDIENTE ${c.number} · ${c.date}</div>
+    <h3>${c.title}</h3><p>${c.teaser}</p>
+    <div class="progress"><span style="width:${pct(c)}%"></span></div>
+    <div class="chips"><span class="chip">${c.difficulty}</span><span class="chip ${p.solved?'done':''}">${p.solved?'Resuelto · '+scoreFor(p)+'/100':'Progreso '+pct(c)+'%'}</span></div>
+  </article>`;
+}
+function renderHome(){
+  const solved=CASES.filter(c=>progressFor(c.id).solved).length;
+  const words=CASES.reduce((a,c)=>a+progressFor(c.id).found.length,0);
+  const codes=CASES.reduce((a,c)=>a+progressFor(c.id).codesSolved.filter(Boolean).length,0);
+  document.getElementById('homeStats').innerHTML=`<div class="stat"><strong>${solved}</strong><span>resueltos</span></div><div class="stat"><strong>${words}</strong><span>palabras</span></div><div class="stat"><strong>${codes}</strong><span>códigos</span></div>`;
+  document.getElementById('homeCases').innerHTML=CASES.slice(0,2).map(caseCard).join('');
+}
+function renderCases(){
+  let list=CASES;
+  if(caseFilter==='solved')list=list.filter(c=>progressFor(c.id).solved);
+  if(caseFilter==='pending')list=list.filter(c=>!progressFor(c.id).solved);
+  document.getElementById('caseList').innerHTML=list.length?list.map(caseCard).join(''):'<div class="empty">No hay expedientes en este filtro.</div>';
+}
+document.getElementById('caseFilters').addEventListener('click',e=>{
+  const b=e.target.closest('[data-filter]');if(!b)return;
+  caseFilter=b.dataset.filter;
+  document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));
+  renderCases();
+});
+document.addEventListener('click',e=>{const card=e.target.closest('[data-open-case]');if(card)openCase(card.dataset.openCase);});
+
+function renderIntro(c,p){
+  return `<div class="story-intro">${c.intro.map(paragraph=>`<p>${paragraph.replace(/\[([A-Z]+)\]/g,(_,w)=>`<span class="blank ${p.found.includes(w)?'filled':''}">${p.found.includes(w)?w:'_'.repeat(Math.max(4,w.length))}</span>`)}</p>`).join('')}</div>`;
+}
+function findWordPath(grid,word){
+  const dirs=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]],rows=grid.length,cols=grid[0].length;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)for(const[dr,dc]of dirs){
+    const path=[];let ok=true;
+    for(let i=0;i<word.length;i++){
+      const rr=r+dr*i,cc=c+dc*i;
+      if(rr<0||cc<0||rr>=rows||cc>=cols||grid[rr][cc]!==word[i]){ok=false;break;}
+      path.push([rr,cc]);
+    }
+    if(ok)return path;
+  }
+  return null;
+}
+function foundCellSet(c,p){
+  const set=new Set();
+  c.words.filter(w=>!w.missing&&p.found.includes(w.answer)).forEach(w=>findWordPath(c.grid,w.answer)?.forEach(([r,col])=>set.add(`${r}-${col}`)));
+  return set;
+}
+function rawLeftovers(c,top){
+  const used=new Set();
+  c.words.filter(w=>!w.missing).forEach(w=>findWordPath(c.grid,w.answer)?.forEach(([r,col])=>used.add(`${r}-${col}`)));
+  let chars='';
+  c.grid.forEach((row,r)=>[...row].forEach((ch,col)=>{if((top?r<5:r>=5)&&!used.has(`${r}-${col}`))chars+=ch;}));
+  return chars;
+}
+function chunkLetters(text){return text.match(/.{1,4}/g)?.join(' ')||text;}
+function allCodesSolved(c,p){return c.codes.every((_,i)=>p.codesSolved[i]);}
+function useHint(p,key,title,text){
+  if(!p.hintKeys.includes(key)){p.hintKeys.push(key);p.hints++;saveState();refreshGlobal();}
+  showModal(`<div class="eyebrow">Pista utilizada</div><h3>${title}</h3><p class="hint">${text}</p><button class="btn" data-close-modal>Volver al expediente</button>`);
+}
+function directionLabel(path){
+  if(!path||path.length<2)return'';
+  const dr=Math.sign(path[1][0]-path[0][0]),dc=Math.sign(path[1][1]-path[0][1]);
+  if(dr===0)return dc>0?'horizontal hacia la derecha':'horizontal hacia la izquierda';
+  if(dc===0)return dr>0?'vertical hacia abajo':'vertical hacia arriba';
+  return `${dr>0?'diagonal hacia abajo':'diagonal hacia arriba'} y ${dc>0?'la derecha':'la izquierda'}`;
+}
+
+function openCase(id){activeCaseId=id;renderCase();nav('case');}
+function renderCase(){
+  const c=CASES.find(x=>x.id===activeCaseId);if(!c)return;
+  const p=progressFor(c.id),foundCells=foundCellSet(c,p);
+  const allPresent=c.words.filter(w=>!w.missing).every(w=>p.found.includes(w.answer));
+  const showLeftovers=p.missingSolved;
+  const gridHtml=c.grid.map((row,r)=>[...row].map((ch,col)=>`<button class="letter ${foundCells.has(`${r}-${col}`)?'found':''} ${showLeftovers&&!foundCells.has(`${r}-${col}`)?'leftover':''}" data-r="${r}" data-c="${col}" aria-label="Fila ${r+1}, columna ${col+1}, letra ${ch}">${ch}</button>`).join('')).join('');
+  const topRaw=showLeftovers?rawLeftovers(c,true):'',bottomRaw=showLeftovers?rawLeftovers(c,false):'';
+  document.getElementById('screen-case').innerHTML=`
+    <div class="case-header"><button class="icon-btn back" data-nav="cases" aria-label="Volver">←</button><div><small>EXPEDIENTE ${c.number} · ${c.date}</small><h2>${c.title}</h2></div></div>
+    <div class="demo-badge">DEMO V2 · caso real documentado · ${pct(c)}% completado</div>
+    <article class="paper" style="margin-top:14px">${renderIntro(c,p)}</article>
+    <div class="game-layout">
+      <article class="card game-panel"><div class="eyebrow">Fase 1</div><h3>Sopa de letras</h3><p class="hint">Arrastra en línea recta. Siete palabras sí aparecen. Una está ausente y tendrás que identificarla sin opciones.</p>
+        <div class="word-grid" id="wordGrid" style="grid-template-columns:repeat(${c.grid[0].length},1fr)">${gridHtml}</div>
+      </article>
+      <article class="card game-panel"><div class="eyebrow">Palabras del expediente</div><div class="word-list">${c.words.map(w=>`<div class="word-item ${p.found.includes(w.answer)?'found':''} ${w.missing&&p.missingSolved?'missing-found':''}">${w.mask}</div>`).join('')}</div>
+        <p class="hint">Encontradas: ${p.found.length}/${c.words.length-1}. La pista ya no dibuja la palabra entera, porque tampoco vamos a resolverte el crucigrama con una excavadora.</p>
+        <button class="btn secondary" id="hintBtn">Pista de ubicación</button>
+      </article>
+    </div>
+    <article class="card stage ${allPresent?'':'locked'}"><div class="eyebrow">Fase 2</div><h3>La palabra ausente</h3>
+      ${!allPresent?'<p class="hint">Encuentra primero las siete palabras presentes.</p>':p.missingSolved?'<p class="status-ok">✓ Arma identificada mediante la palabra que faltaba.</p>':`<p class="hint">Escribe la palabra de la lista que no estaba en la sopa. Esa palabra identifica el arma.</p><div class="answer-block"><label class="field-label">Arma deducida<input class="field" id="missingAnswer" autocomplete="off" placeholder="Escríbela, sin elegir entre opciones"></label><button class="btn" id="checkMissing">Comprobar arma</button></div>`}
+    </article>
+    ${p.missingSolved?renderLeftoverStage(c,p,topRaw,bottomRaw):''}
+    ${p.leftoversSolved?renderCodesStage(c,p):''}
+    ${p.leftoversSolved?renderEvidence(c,p):''}
+    ${allCodesSolved(c,p)?deductionHtml(c,p):''}
+  `;
+  setupGridSelection(c,p);bindCaseActions(c,p);
+}
+function renderLeftoverStage(c,p,topRaw,bottomRaw){
+  return `<article class="card stage"><div class="eyebrow">Fase 3</div><h3>Letras sobrantes</h3>
+    <p class="hint">Las casillas claras no pertenecen a ninguna palabra encontrada. Copia y analiza ambos bloques. Hay letras útiles y ruido añadido; la app no escribirá la solución por ti.</p>
+    <div class="leftover-wrap"><div><small class="eyebrow">Bloque A · primeras cinco filas</small><div class="leftover-strip">${chunkLetters(topRaw)}</div></div><div><small class="eyebrow">Bloque B · filas restantes</small><div class="leftover-strip">${chunkLetters(bottomRaw)}</div></div></div>
+    ${p.leftoversSolved?'<p class="status-ok">✓ Identidad y ubicación descifradas correctamente.</p>':`<div class="answer-block"><label class="field-label">Identidad escondida<input class="field" id="leftoverCulprit" autocomplete="off" placeholder="Nombre y apellidos"></label><label class="field-label">Ubicación escondida<input class="field" id="leftoverPlace" autocomplete="off" placeholder="Ciudad o lugar"></label><div class="actions"><button class="btn" id="checkLeftovers">Validar descifrado</button><button class="btn secondary" id="leftoverHint">Pista de lectura</button></div></div>`}
+  </article>`;
+}
+function renderCodesStage(c,p){
+  return `<article class="card stage"><div class="eyebrow">Fase 4</div><h3>Archivo de códigos secretos</h3><p class="hint">Se abren en orden. Cada mensaje correcto revela una prueba documental para la conclusión final.</p><div class="code-stack">${c.codes.map((code,i)=>{
+    const solved=!!p.codesSolved[i],unlocked=i===0||p.codesSolved[i-1];
+    return `<section class="code-card ${solved?'solved':''} ${!unlocked?'locked':''}"><div class="eyebrow">Código ${i+1} · ${code.type}</div><h4>${code.title}</h4>${!unlocked?'<p class="hint">Bloqueado hasta resolver el código anterior.</p>':`<p class="cipher">${code.text}</p>${solved?`<p class="status-ok">✓ Descifrado</p><p class="hint">Prueba revelada: ${code.reveal}</p>`:`<label class="field-label">Mensaje descifrado<input class="field" id="codeAnswer-${i}" autocomplete="off" placeholder="Escribe la solución"></label><div class="actions"><button class="btn" data-check-code="${i}">Comprobar código</button><button class="btn secondary" data-code-hint="${i}">Ver pista</button></div>`}`}</section>`;
+  }).join('')}</div></article>`;
+}
+function renderEvidence(c,p){
+  const solvedCount=p.codesSolved.filter(Boolean).length;
+  return `<article class="card stage"><div class="eyebrow">Mesa de pruebas</div><h3>Pistas para construir la respuesta</h3><p class="hint">No hay respuestas seleccionables. Lee, relaciona y escribe tu conclusión cuando todas las pruebas estén abiertas.</p><div class="evidence-list">${c.clues.map((clue,i)=>{
+    const open=solvedCount>=clue.unlock;
+    return `<div class="evidence ${open?'':'locked'}"><div class="seal">${open?'✓':'?'}</div><div><strong>${open?clue.title:'Documento clasificado'}</strong><p>${open?clue.text:'Resuelve más códigos para abrir esta prueba.'}</p></div></div>`;
+  }).join('')}</div></article>`;
+}
+function deductionHtml(c,p){
+  if(p.solved){
+    const score=scoreFor(p);
+    return `<article class="card stage reveal"><div class="eyebrow">Expediente resuelto</div><h3>Historia completa</h3><div class="score-panel"><div class="score-number">${score}</div><div><strong>${rankFor(score)}</strong><div class="hint">${p.hints} pistas usadas · ${p.attempts} conclusiones incorrectas</div></div></div>${c.story.map(section=>`<section class="story-section"><h4>${section.title}</h4><p>${section.body}</p></section>`).join('')}<div class="chips"><span class="chip done">Responsable: ${c.final.culprit}</span><span class="chip done">Arma: ${c.final.weapon}</span><span class="chip done">Lugar: ${c.final.place}</span></div><details><summary>Fuentes verificables</summary><ul>${c.sources.map(s=>`<li><a href="${s.url}" target="_blank" rel="noopener">${s.label}</a></li>`).join('')}</ul></details></article>`;
+  }
+  return `<article class="card stage"><div class="eyebrow">Fase final</div><h3>Presenta tu conclusión</h3><p class="hint">No hay desplegables ni respuestas sugeridas. Usa la sopa, los sobrantes, los códigos y los documentos.</p><div class="form-grid"><label class="field-label">Responsable<input class="field" id="finalCulprit" autocomplete="off" placeholder="Nombre y apellidos"></label><label class="field-label">Arma<input class="field" id="finalWeapon" autocomplete="off" placeholder="Tipo o modelo"></label><label class="field-label">Lugar exacto del ataque<input class="field" id="finalPlace" autocomplete="off" placeholder="Edificio, ciudad o escenario"></label><button class="btn" id="solveCase">Cerrar expediente</button><div class="feedback" aria-live="polite">Los errores no enseñan la respuesta; te indican cuántas piezas no encajan.</div></div></article>`;
+}
+
+function setupGridSelection(c,p){
+  const grid=document.getElementById('wordGrid');if(!grid)return;
+  let start=null,current=[];
+  const clear=()=>{grid.querySelectorAll('.selecting').forEach(x=>x.classList.remove('selecting'));current=[];};
+  const cellAt=(x,y)=>document.elementFromPoint(x,y)?.closest('.letter');
+  const path=(a,b)=>{const dr=b.r-a.r,dc=b.c-a.c;if(!(dr===0||dc===0||Math.abs(dr)===Math.abs(dc)))return[];const steps=Math.max(Math.abs(dr),Math.abs(dc)),sr=Math.sign(dr),sc=Math.sign(dc);return Array.from({length:steps+1},(_,i)=>[a.r+sr*i,a.c+sc*i]);};
+  grid.addEventListener('pointerdown',e=>{const cell=e.target.closest('.letter');if(!cell)return;e.preventDefault();start={r:+cell.dataset.r,c:+cell.dataset.c};current=[[start.r,start.c]];cell.classList.add('selecting');grid.setPointerCapture?.(e.pointerId);});
+  grid.addEventListener('pointermove',e=>{if(!start)return;e.preventDefault();const cell=cellAt(e.clientX,e.clientY);if(!cell)return;clear();current=path(start,{r:+cell.dataset.r,c:+cell.dataset.c});current.forEach(([r,col])=>grid.querySelector(`[data-r="${r}"][data-c="${col}"]`)?.classList.add('selecting'));});
+  const finish=()=>{if(!start)return;const selected=current.map(([r,col])=>c.grid[r][col]).join(''),rev=[...selected].reverse().join('');const word=c.words.find(w=>!w.missing&&!p.found.includes(w.answer)&&(w.answer===selected||w.answer===rev));clear();start=null;if(word){p.found.push(word.answer);saveState();toast(`Palabra encontrada: ${word.answer}`);refreshGlobal();renderCase();}else if(selected.length>1)toast('Esa línea no coincide con una palabra pendiente.');};
+  grid.addEventListener('pointerup',finish);grid.addEventListener('pointercancel',()=>{clear();start=null;});
+}
+function bindCaseActions(c,p){
+  document.getElementById('hintBtn')?.addEventListener('click',()=>{
+    const remaining=c.words.filter(w=>!w.missing&&!p.found.includes(w.answer));
+    if(!remaining.length){toast('Ya has encontrado todas las palabras presentes.');return;}
+    const w=remaining[0],path=findWordPath(c.grid,w.answer),cell=path?.[0];
+    if(cell){document.querySelector(`[data-r="${cell[0]}"][data-c="${cell[1]}"]`)?.classList.add('hint-cell');setTimeout(()=>document.querySelector('.letter.hint-cell')?.classList.remove('hint-cell'),1800);}
+    const key=`word-${w.answer}`;if(!p.hintKeys.includes(key)){p.hintKeys.push(key);p.hints++;saveState();refreshGlobal();}
+    toast(`Empieza por ${w.answer[0]} en la fila ${cell[0]+1}, columna ${cell[1]+1}; va ${directionLabel(path)}.`);
+  });
+  document.getElementById('checkMissing')?.addEventListener('click',()=>{
+    const value=document.getElementById('missingAnswer').value;
+    if(matches(value,c.missingAliases)){p.missingSolved=true;persistAndRefreshCase();toast('Arma identificada. Ahora toca leer lo que sobra.');}
+    else toast('Esa palabra sí debería encajar con la lista incompleta. Revísala.');
+  });
+  document.getElementById('checkLeftovers')?.addEventListener('click',()=>{
+    const culprit=document.getElementById('leftoverCulprit').value,place=document.getElementById('leftoverPlace').value;
+    const okC=matches(culprit,c.leftover.culpritAliases),okP=matches(place,c.leftover.placeAliases);
+    if(okC&&okP){p.leftoversSolved=true;persistAndRefreshCase();toast('Letras sobrantes descifradas. Se abre el archivo de códigos.');}
+    else toast(`El descifrado tiene ${Number(!okC)+Number(!okP)} dato${Number(!okC)+Number(!okP)===1?'':'s'} incorrecto${Number(!okC)+Number(!okP)===1?'':'s'}.`);
+  });
+  document.getElementById('leftoverHint')?.addEventListener('click',()=>useHint(p,'leftover-reading','Cómo separar el mensaje','En ambos bloques, el fragmento útil aparece al principio. La primera X actúa como corte; lo que sigue es ruido para que no baste con copiar toda la línea.'));
+  document.querySelectorAll('[data-check-code]').forEach(btn=>btn.addEventListener('click',()=>{
+    const i=+btn.dataset.checkCode,input=document.getElementById(`codeAnswer-${i}`),code=c.codes[i];
+    if(matches(input.value,[code.answer])){p.codesSolved[i]=true;persistAndRefreshCase();toast(`Código ${i+1} descifrado. Prueba añadida al expediente.`);}
+    else toast('El mensaje todavía no cuadra. Comprueba el sistema de cifrado y los espacios.');
+  }));
+  document.querySelectorAll('[data-code-hint]').forEach(btn=>btn.addEventListener('click',()=>{
+    const i=+btn.dataset.codeHint,code=c.codes[i];useHint(p,`code-${i}`,code.type,code.hint);
+  }));
+  document.getElementById('solveCase')?.addEventListener('click',()=>{
+    const okC=matches(document.getElementById('finalCulprit').value,c.final.culpritAliases);
+    const okW=matches(document.getElementById('finalWeapon').value,c.final.weaponAliases);
+    const okP=matches(document.getElementById('finalPlace').value,c.final.placeAliases);
+    const wrong=Number(!okC)+Number(!okW)+Number(!okP);
+    if(!wrong){p.solved=true;persistAndRefreshCase();toast('Expediente resuelto. Historia completa desbloqueada.');}
+    else{p.attempts++;saveState();refreshGlobal();toast(`Hay ${wrong} pieza${wrong===1?'':'s'} de la conclusión que no encaja${wrong===1?'':'n'}.`);}
+  });
+}
+
+function renderArchive(){
+  document.getElementById('archiveList').innerHTML=CASES.map(c=>{const p=progressFor(c.id);return `<article class="card archive-row"><div><strong>${c.number} · ${c.title}</strong><br><small>${p.solved?`${rankFor(scoreFor(p))} · ${scoreFor(p)}/100`:`${pct(c)}% completado · ${p.hints} pistas usadas`}</small></div><button class="btn secondary" data-open-case="${c.id}">${p.solved?'Revisar':'Continuar'}</button></article>`;}).join('');
+}
+function renderMiniGames(){
+  const target=document.getElementById('miniGrid');if(!target)return;
+  target.innerHTML=MINIGAMES.map(g=>`<article class="card mini-card"><div class="eyebrow">${g.type}</div><h3>${g.title}</h3><p class="cipher">${g.text}</p>${state.mini[g.id]?'<p class="mini-done">✓ Resuelto</p>':`<label class="field-label">Solución<input class="field" id="mini-${g.id}" autocomplete="off" placeholder="Escribe el mensaje"></label><div class="actions"><button class="btn" data-check-mini="${g.id}">Comprobar</button><button class="btn secondary" data-mini-hint="${g.id}">Pista</button></div>`}</article>`).join('');
+}
+document.getElementById('screen-minigames').addEventListener('click',e=>{
+  const check=e.target.closest('[data-check-mini]');
+  if(check){const g=MINIGAMES.find(x=>x.id===check.dataset.checkMini),input=document.getElementById(`mini-${g.id}`);if(matches(input.value,[g.answer])){state.mini[g.id]=true;saveState();renderMiniGames();toast('Código correcto. Neuronas oficialmente operativas.');}else toast('Todavía no. El cifrado sigue ganando por puntos.');}
+  const hint=e.target.closest('[data-mini-hint]');
+  if(hint){const g=MINIGAMES.find(x=>x.id===hint.dataset.miniHint);showModal(`<div class="eyebrow">Pista de entrenamiento</div><h3>${g.type}</h3><p class="hint">${g.hint}</p><button class="btn" data-close-modal>Volver</button>`);}
+});
+
+function applySettings(){
+  document.body.classList.toggle('paper-mode',!!state.settings.paper);
+  document.body.classList.toggle('reduce-motion',!!state.settings.reducedMotion);
+  document.getElementById('paperSwitch')?.classList.toggle('on',!!state.settings.paper);
+  document.getElementById('motionSwitch')?.classList.toggle('on',!!state.settings.reducedMotion);
+}
+document.getElementById('paperSwitch').addEventListener('click',()=>{state.settings.paper=!state.settings.paper;saveState();applySettings();});
+document.getElementById('motionSwitch').addEventListener('click',()=>{state.settings.reducedMotion=!state.settings.reducedMotion;saveState();applySettings();});
+document.getElementById('resetProgress').addEventListener('click',()=>showModal(`<h3>¿Borrar todo el progreso?</h3><p class="hint">Los tres expedientes y los cuatro entrenamientos volverán a cero.</p><div class="actions"><button class="btn danger" id="confirmReset">Borrar</button><button class="btn secondary" data-close-modal>Cancelar</button></div>`));
+document.addEventListener('click',e=>{if(e.target.id==='confirmReset'){state=clone(defaultState);saveState();closeModal();refreshGlobal();nav('home');toast('Progreso borrado. La burocracia vuelve a ganar.');}});
+
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;});
+async function installApp(){
+  if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;return;}
+  showModal(`<h3>Instalar en el móvil</h3><p class="hint"><strong>iPhone:</strong> abre la web en Safari, toca Compartir y elige “Añadir a pantalla de inicio”.</p><p class="hint"><strong>Android:</strong> abre el menú del navegador y pulsa “Instalar aplicación”.</p><button class="btn" data-close-modal>Entendido</button>`);
+}
+document.getElementById('installTop').addEventListener('click',installApp);
+document.getElementById('installSettings').addEventListener('click',installApp);
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+refreshGlobal();
+
+  </script>
 </body>
 </html>
