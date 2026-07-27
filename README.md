@@ -1,42 +1,22 @@
-# Expediente Oculto · Demo V2.2
+# Expediente Oculto · Demo V2.3
 
-Demo técnica y jugable de **Expediente Oculto**. No es la aplicación final de 80 casos.
+Demo funcional de una PWA de investigación basada en casos reales documentados.
 
-## Incluye
+## Contenido de la demo
 
-- 3 expedientes históricos reales documentados.
-- Sopas de letras táctiles.
-- Una palabra ausente que el jugador debe escribir.
-- Letras sobrantes que el jugador debe leer, descifrar y escribir.
+- 3 expedientes jugables de principio a fin.
+- Sopa de letras táctil.
+- Palabra ausente escrita manualmente.
+- Letras sobrantes para descifrar responsable y ubicación.
 - 4 códigos secretos por expediente.
-- Pistas documentales progresivas en lugar de preguntas tipo test.
-- Conclusión final con respuestas de texto libre.
-- Historias iniciales y finales ampliadas.
-- Progreso, puntuación, modo papel y funcionamiento sin conexión.
+- Deducción final mediante campos de texto.
+- Historia completa y fuentes al resolver.
+- Progreso guardado en el dispositivo.
 
-## Publicar en GitHub Pages
+## Corrección principal de V2.3
 
-1. Sube todos los archivos y carpetas a la raíz del repositorio.
-2. En GitHub, abre **Settings → Pages**.
-3. Selecciona **Deploy from a branch**, rama `main` y carpeta `/(root)`.
-4. Guarda y espera a que GitHub muestre la dirección publicada.
+Se reparó el gestor de estado. Antes, el cálculo del porcentaje sustituía el objeto de progreso mientras los botones conservaban una referencia antigua; por eso la interfaz reaccionaba pero no guardaba ni desbloqueaba las fases. V2.3 mantiene una única referencia de progreso y verifica el flujo completo de los tres casos.
 
-Para una subida rápida desde móvil también se incluye una versión autónoma en un solo `index.html`, aunque la carpeta completa es la recomendada para instalación PWA.
+## Publicación en GitHub Pages
 
-## Fuentes
-
-Cada expediente contiene enlaces a fuentes institucionales o museísticas verificables. Los casos distinguen hechos documentados, resoluciones judiciales y controversias posteriores.
-
-
-## Corrección V2.2
-- La fase 2 acepta variantes y pequeños errores al escribir el arma.
-- Al acertar, desplaza automáticamente a la fase 3.
-- Añade confirmación visible y permite validar con Enter.
-
-
-## Corrección V2.2
-
-- La fase 3 siempre aparece en pantalla: bloqueada antes de resolver el arma y jugable después.
-- El expediente se vuelve a renderizar antes de actualizar el resto de pantallas.
-- Al desbloquear una fase, la app se desplaza hasta ella y la resalta.
-- El service worker usa navegación con red primero para evitar versiones antiguas atrapadas en caché.
+Sube todos los archivos a la raíz del repositorio. En GitHub, abre **Settings → Pages**, elige **Deploy from a branch**, selecciona `main` y `/(root)`.

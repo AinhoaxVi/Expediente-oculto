@@ -22,6 +22,7 @@
       --text: #f4f0e3;
       --muted: #aba994;
       --accent: #d0a94d;
+      --accent-soft: rgba(208,169,77,.55);
       --accent-2: #a33a32;
       --success: #67b67a;
       --border: rgba(244,240,227,.14);
@@ -134,7 +135,7 @@
     .filter.active { color:#16140d; background:var(--accent); border-color:transparent; font-weight:800; }
     .bottom-nav {
       position:fixed; z-index:30; left:50%; bottom:0; transform:translateX(-50%);
-      width:min(100%, 880px); display:grid; grid-template-columns:repeat(4,1fr);
+      width:min(100%, 880px); display:grid; grid-template-columns:repeat(5,1fr);
       padding:8px 8px var(--safe-bottom); background:color-mix(in srgb, var(--bg) 92%, transparent);
       backdrop-filter:blur(18px); border-top:1px solid var(--border);
     }
@@ -319,6 +320,7 @@
       <button class="nav-btn" data-nav="cases"><span>▤</span>Casos</button>
       <button class="nav-btn" data-nav="minigames"><span>⌘</span>Juegos</button>
       <button class="nav-btn" data-nav="archive"><span>◫</span>Archivo</button>
+      <button class="nav-btn" data-nav="settings"><span>⚙</span>Ajustes</button>
     </nav>
   </div>
   <div class="toast" id="toast"></div>
@@ -343,11 +345,15 @@ function loadState(){
 function saveState(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }
 function progressFor(id){
   const base={found:[],missingSolved:false,leftoversSolved:false,codesSolved:[],solved:false,hints:0,attempts:0,hintKeys:[]};
-  state.progress[id]={...base,...(state.progress[id]||{})};
-  if(!Array.isArray(state.progress[id].found))state.progress[id].found=[];
-  if(!Array.isArray(state.progress[id].codesSolved))state.progress[id].codesSolved=[];
-  if(!Array.isArray(state.progress[id].hintKeys))state.progress[id].hintKeys=[];
-  return state.progress[id];
+  if(!state.progress[id]||typeof state.progress[id]!=='object')state.progress[id]={};
+  const progress=state.progress[id];
+  for(const [key,value] of Object.entries(base)){
+    if(progress[key]===undefined)progress[key]=Array.isArray(value)?[]:value;
+  }
+  if(!Array.isArray(progress.found))progress.found=[];
+  if(!Array.isArray(progress.codesSolved))progress.codesSolved=[];
+  if(!Array.isArray(progress.hintKeys))progress.hintKeys=[];
+  return progress;
 }
 function normalize(text=''){
   return String(text).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -366,13 +372,6 @@ function editDistance(a,b){
   }
   return row[b.length];
 }
-function adjacentSwapMatch(a,b){
-  a=normalize(a);b=normalize(b);
-  if(a.length!==b.length)return false;
-  const diffs=[];
-  for(let i=0;i<a.length;i++)if(a[i]!==b[i])diffs.push(i);
-  return diffs.length===2&&diffs[1]===diffs[0]+1&&a[diffs[0]]===b[diffs[1]]&&a[diffs[1]]===b[diffs[0]];
-}
 function missingAnswerMatches(c,value){
   const n=normalize(value);
   if(!n)return false;
@@ -387,7 +386,7 @@ function missingAnswerMatches(c,value){
     const target=normalize(alias);
     if(n.length<5||target.length<5)return false;
     const allowance=Math.max(n.length,target.length)>=8?2:1;
-    return adjacentSwapMatch(n,target)||editDistance(n,target)<=allowance;
+    return editDistance(n,target)<=allowance;
   });
 }
 function pct(c){
@@ -504,6 +503,20 @@ function rawLeftovers(c,top){
 }
 function chunkLetters(text){return text.match(/.{1,4}/g)?.join(' ')||text;}
 function allCodesSolved(c,p){return c.codes.every((_,i)=>p.codesSolved[i]);}
+function runDataChecks(){
+  return CASES.map(c=>{
+    const present=c.words.filter(w=>!w.missing);
+    const missing=c.words.filter(w=>w.missing);
+    return {
+      id:c.id,
+      gridRectangular:c.grid.length>0&&c.grid.every(row=>row.length===c.grid[0].length),
+      presentWordsFound:present.every(w=>!!findWordPath(c.grid,w.answer)),
+      missingWordsAbsent:missing.every(w=>!findWordPath(c.grid,w.answer)),
+      codesValid:c.codes.every(code=>code.answer&&code.text&&code.hint&&code.reveal),
+      finalAliasesValid:[c.final.culpritAliases,c.final.weaponAliases,c.final.placeAliases].every(list=>Array.isArray(list)&&list.length>0)
+    };
+  });
+}
 function useHint(p,key,title,text){
   if(!p.hintKeys.includes(key)){p.hintKeys.push(key);p.hints++;saveState();refreshGlobal();}
   showModal(`<div class="eyebrow">Pista utilizada</div><h3>${title}</h3><p class="hint">${text}</p><button class="btn" data-close-modal>Volver al expediente</button>`);
@@ -526,7 +539,7 @@ function renderCase(){
   const topRaw=showLeftovers?rawLeftovers(c,true):'',bottomRaw=showLeftovers?rawLeftovers(c,false):'';
   document.getElementById('screen-case').innerHTML=`
     <div class="case-header"><button class="icon-btn back" data-nav="cases" aria-label="Volver">←</button><div><small>EXPEDIENTE ${c.number} · ${c.date}</small><h2>${c.title}</h2></div></div>
-    <div class="demo-badge">DEMO V2.2 · caso real documentado · ${pct(c)}% completado</div>
+    <div class="demo-badge">DEMO V2.3 · caso real documentado · ${pct(c)}% completado</div>
     <article class="paper" style="margin-top:14px">${renderIntro(c,p)}</article>
     <div class="game-layout">
       <article class="card game-panel"><div class="eyebrow">Fase 1</div><h3>Sopa de letras</h3><p class="hint">Arrastra en línea recta. Siete palabras sí aparecen. Una está ausente y tendrás que identificarla sin opciones.</p>
@@ -673,7 +686,7 @@ async function installApp(){
 }
 document.getElementById('installTop').addEventListener('click',installApp);
 document.getElementById('installSettings').addEventListener('click',installApp);
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=2.2').catch(()=>{}));
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=2.3').catch(()=>{}));
 
 refreshGlobal();
 
