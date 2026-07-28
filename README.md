@@ -1,22 +1,14 @@
-# Expediente Oculto · Demo V2.3
+# Expediente Oculto · Expansión V3
 
-Demo funcional de una PWA de investigación basada en casos reales documentados.
+PWA demo ampliada con 13 expedientes reales de los 80 previstos.
 
-## Contenido de la demo
+Incluye:
+- Sopas de letras táctiles.
+- Palabra ausente como arma escrita manualmente.
+- Letras sobrantes para responsable y lugar.
+- Códigos César, A1Z26, Atbash, Morse, binario, hexadecimal y mensajes invertidos.
+- Conclusión final libre.
+- Historias completas con fuentes.
+- Progreso local, modo papel y reducción de animaciones.
 
-- 3 expedientes jugables de principio a fin.
-- Sopa de letras táctil.
-- Palabra ausente escrita manualmente.
-- Letras sobrantes para descifrar responsable y ubicación.
-- 4 códigos secretos por expediente.
-- Deducción final mediante campos de texto.
-- Historia completa y fuentes al resolver.
-- Progreso guardado en el dispositivo.
-
-## Corrección principal de V2.3
-
-Se reparó el gestor de estado. Antes, el cálculo del porcentaje sustituía el objeto de progreso mientras los botones conservaban una referencia antigua; por eso la interfaz reaccionaba pero no guardaba ni desbloqueaba las fases. V2.3 mantiene una única referencia de progreso y verifica el flujo completo de los tres casos.
-
-## Publicación en GitHub Pages
-
-Sube todos los archivos a la raíz del repositorio. En GitHub, abre **Settings → Pages**, elige **Deploy from a branch**, selecciona `main` y `/(root)`.
+Sube `index.html`, `sw.js`, `manifest.json`, `.nojekyll` e `icons/` a GitHub Pages.
